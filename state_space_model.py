@@ -12,6 +12,7 @@ class state_space_model:
         self.x_history = []
         self.y_history = []
         self.u_history = []
+        self.y_history.append(init_state_vector)
 
     def step(self, u=None):
         if u == None:
@@ -34,6 +35,5 @@ if __name__ == "__main__":
     D = np.zeros([2,2])
     init_sv = np.array([0.0, 1.0])
     model = state_space_model(init_state_vector=init_sv, A=A, B=B, C=C, D=D)
-    for i in range(1000):
-        model.step()
-        print(model.measure())
+    
+   

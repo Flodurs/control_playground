@@ -9,6 +9,7 @@ class kalman_filter:
         self.x = init_state_vector
         self.P = np.identity(self.state_vector_length)
 
+
         # state space model
         self.A=A
         self.B=B
@@ -17,7 +18,7 @@ class kalman_filter:
 
         # cov
         self.Q = np.diag([0.2, 0.2])
-        self.R = np.diag((0.0, 0.1))
+        self.R = np.diag((0.0, 0.10))
 
         # oberserver transform
         self.H = np.array([[0, 0],[0, 1]])
@@ -30,7 +31,7 @@ class kalman_filter:
 
         print(f"Predicted x: {self.x}")
         print(f"Predicted P: {self.P}")
-
+        print(f"m: {z}")
         #print(np.matmul(self.H, np.matmul(self.P, np.transpose(self.H))) + self.R)
         # correction
         K = np.matmul(np.matmul(self.P, np.transpose(self.H)), np.linalg.pinv(np.matmul(self.H, np.matmul(self.P, np.transpose(self.H))) + self.R))
@@ -49,19 +50,35 @@ if __name__ == "__main__":
     x_true = []
     x_estimate = []
     measurements = []
-    for i in range(100):
-        world.step()
+    errors = []
+
+
+    fig, axs = plt.subplots(3)
+    plt.ion()
+    plt.show()
+    fig.tight_layout()
+    while True:
+        
         measurement = world.measure()
+        world.step()
         filter.step(np.zeros(2), measurement)
+        
+
         x_true.append(world.x[0])
         x_estimate.append(filter.x[0])
         measurements.append(measurement[1])
+        errors.append(abs(world.x[0]-filter.x[0]))
         print(f"True state: {world.x}")
         print(f"Estimated state: {filter.x}")
         print("-------------------------\n")
-
-    plt.plot(x_true, label="True x position [m]")
-    plt.plot(x_estimate, label="Estimated x position [m]")
-    plt.plot(measurements, label="Velocity measurements [m/s]")
-    plt.legend()
-    plt.show()
+        
+        for ax in axs:
+            ax.clear()
+        axs[0].plot(x_true, label="True x position [m]")
+        axs[0].plot(x_estimate, label="Estimated x position [m]")
+        axs[1].plot(measurements, label="Velocity measurements [m/s]")
+        axs[2].plot(errors, label="Estimation error")
+        for ax in axs:
+            ax.legend()
+        fig.canvas.draw()
+        plt.pause(0.1)
