@@ -24,11 +24,10 @@ def axis_angle_to_quaternion(aa):
     return np.array([q0, q1, q2, q3])
 
 def quat_mul(q_a, q_b):
-    print()
     q0 = q_a[0]*q_b[0]-q_a[1]*q_b[1]-q_a[2]*q_b[2]-q_a[3]*q_b[3]
-    q1 = q_a[0]*q_b[1]-q_a[1]*q_b[0]-q_a[2]*q_b[3]-q_a[3]*q_b[2]
-    q2 = q_a[0]*q_b[2]-q_a[1]*q_b[3]-q_a[2]*q_b[0]-q_a[3]*q_b[1]
-    q3 = q_a[0]*q_b[3]-q_a[1]*q_b[2]-q_a[2]*q_b[1]-q_a[3]*q_b[0]
+    q1 = q_a[0]*q_b[1]+q_a[1]*q_b[0]-q_a[2]*q_b[3]+q_a[3]*q_b[2]
+    q2 = q_a[0]*q_b[2]+q_a[1]*q_b[3]+q_a[2]*q_b[0]-q_a[3]*q_b[1]
+    q3 = q_a[0]*q_b[3]-q_a[1]*q_b[2]+q_a[2]*q_b[1]+q_a[3]*q_b[0]
     return np.array([q0, q1, q2, q3])
 
 def quat_inv(q):
@@ -40,11 +39,11 @@ def quat_inv(q):
 
 def quat_passive_rotation(q, p):
     point = np.array([0.0 , p[0], p[1], p[2]])
-    return quat_mul(q, quat_mul(p, quat_inv(q)))
+    return quat_mul(q, quat_mul(point, quat_inv(q)))[1:]
 
 if __name__ == "__main__":
     point = [10, 0, 0]
-    rotation_axis = [0, 1, 1]
+    rotation_axis = [0, 1, 0]
     angle = np.pi/2
     
     rotation_quaternion = axis_angle_to_quaternion(np.array([angle, rotation_axis[0], rotation_axis[1], rotation_axis[2]]))
