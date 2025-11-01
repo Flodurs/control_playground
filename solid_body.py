@@ -2,15 +2,15 @@ import numpy as np
 import quaternion
 
 class solid_body:
-    def __init__(self):
+    def __init__(self, q_init, omega_init, pos_init, vel_init):
         # "I" is the inertial reference frame
         # attitude
-        self.orientation_quaternion_I = None
-        self.angular_velocity_vector_I = None
+        self.orientation_quaternion_I = q_init
+        self.angular_velocity_vector_I = omega_init
 
         # translation
-        self.position_vector_I = None
-        self.velocity_vector_I = None
+        self.position_vector_I = pos_init
+        self.velocity_vector_I = vel_init
     
     def apply_torque(self, torque_vector):
         pass
@@ -18,14 +18,16 @@ class solid_body:
     def apply_force(self, force_vector):
         pass
 
-    def integrate(self, delta_time):
-        pass
-
+    def integration_step(self, delta_time):
+        self.orientation_quaternion_I += self.dq_dt()*delta_time
+        if self.orientation_quaternion_I[3] < 0:
+            self.orientation_quaternion_I = -self.orientation_quaternion_I
+        self.orientation_quaternion_I /= np.linalg.norm(self.orientation_quaternion_I, ord=2)
+        
     def dq_dt(self):
-        return 0.5*quaternion.quat_passive_rotation(self.orientation_quaternion_I*np.array(self.angular_velocity_vector_I[0], 
-                                                    self.angular_velocity_vector_I[1], 
-                                                    self.angular_velocity_vector_I[2], 
-                                                    0.0))
+        return 0.5*quaternion.quat_mul(self.orientation_quaternion_I, np.array([self.angular_velocity_vector_I[0], self.angular_velocity_vector_I[1], self.angular_velocity_vector_I[2], 0.0]))
+    
+
     
 
 
