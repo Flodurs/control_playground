@@ -25,7 +25,8 @@ class solid_body:
         self.orientation_quaternion_I /= np.linalg.norm(self.orientation_quaternion_I, ord=2)
         
     def dq_dt(self):
-        return 0.5*quaternion.quat_mul(self.orientation_quaternion_I, np.array([self.angular_velocity_vector_I[0], self.angular_velocity_vector_I[1], self.angular_velocity_vector_I[2], 0.0]))
+        angular_vel =  np.array([self.angular_velocity_vector_I[0], self.angular_velocity_vector_I[1], self.angular_velocity_vector_I[2], 0.0])
+        return 0.5*quaternion.quat_mul(self.orientation_quaternion_I, angular_vel)
     
 
     
